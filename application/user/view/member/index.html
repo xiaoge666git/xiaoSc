@@ -1,0 +1,99 @@
+{extend name='admin@main'}
+
+{block name="button"}
+
+
+<!--{if auth("store/goods/remove")}-->
+<button data-action='{:url("remove")}' data-rule="id#{key}" class='layui-btn layui-btn-sm layui-btn-primary'>删除用户
+</button>
+<!--{/if}-->
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='member/index_search'}
+    <table class="layui-table margin-top-10" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class='list-table-check-td think-checkbox'>
+                <label><input data-auto-none data-check-target='.list-check-box' type='checkbox'></label>
+            </th>
+
+            <th class='text-left nowrap' >id</th>
+            <th class='text-left nowrap' >账号名</th>
+            <th class='text-left nowrap'>性别</th>
+            <th class='text-left nowrap'>头像</th>
+            <th class='text-left nowrap'>金额</th>
+            <th class='text-left nowrap'>是否会员</th>
+            <th class='text-left nowrap'>积分</th>
+            <th class='text-left nowrap'>状态</th>
+            <th class='text-left nowrap'>创建时间</th>
+            <th class='text-left nowrap'>操作</th>
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr data-dbclick>
+            <td class='list-table-check-td think-checkbox'>
+                <label><input class="list-check-box" value='{$vo.id}' type='checkbox'></label>
+            </td>
+
+            <td class='text-left nowrap'>{$vo.id}</td>
+            <td class='text-left nowrap'>{$vo.name}</td>
+            <td class='text-left nowrap'>{switch name="$vo.sex"}
+                {case value=0}未知{/case}
+                {case value=1}男{/case}
+                {case value=2}女{/case}
+                {/switch}
+            </td>
+            <td class='text-left nowrap'>
+                <img data-tips-image style="width:60px;height:60px" src="{$vo.profile_picture|default=''}"
+                     class="margin-right-5 text-top">
+            </td>
+
+            <td class='text-left nowrap'>{$vo.money}</td>
+            <td class='text-left nowrap'>{switch name="$vo.is_vip"}
+                {case value="0"}不是{/case}
+                {case value="1"}是{/case}
+
+                {/switch}
+            </td>
+            <td class='text-left nowrap'>{$vo.points}</td>
+            <td class='text-left nowrap'>{switch name="$vo.status"}
+                {case value="0"}正常{/case}
+                {case value="1"}封禁{/case}
+                {/switch}
+            </td>
+            <td class='text-left nowrap'>{$vo.created_time}</td>
+            <td class='text-left nowrap'>
+
+                <div class="nowrap margin-bottom-5">
+                    {if auth("edit")}
+                    <a data-dbclick class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={$vo.id}'>查看</a>
+
+                    {/if}
+                    {if $vo.status==0}
+                    {if auth("banned")}
+                    <a data-dbclick class="layui-btn layui-btn-sm"  data-value="id#{$vo.id}" data-action='{:url("banned")}'  data-csrf="{:systoken('banned')}">封禁</a>
+                    {/if}
+                    {/if}
+
+                    {if auth("remove")}
+                    <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除该学生吗？"
+                       data-action="{:url('remove')}" data-value="id#{$vo.id}" data-csrf="{:systoken('remove')}">删 除</a>
+                    {/if}
+
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+
+{/block}

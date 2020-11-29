@@ -1,0 +1,50 @@
+<fieldset>
+    <legend>条件搜索</legend>
+    <form class="layui-form layui-form-pane form-search" action="{:request()->url()}" onsubmit="return false" method="get" autocomplete="off">
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">账号</label>
+            <div class="layui-input-inline">
+                <input name="name" value="{$Think.get.name|default=''}" placeholder="账号查询（模糊）" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-inline">
+                <select class="layui-select" name="sex" lay-search>
+
+                    {foreach [''=>'全部','0'=>'未知','1'=>'男','2'=>'女',] as $key=>$v}
+                    {eq name='Think.get.sex' value='$key.""'}
+                    <option selected value="{$key}">{$v}</option>
+                    {else}
+                    <option value="{$key}">{$v}</option>
+                    {/eq}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">是否会员</label>
+            <div class="layui-input-inline">
+                <select class="layui-select" name="is_vip" lay-search>
+
+                    {foreach [''=>'全部','0'=>'不是','1'=>'是'] as $key=>$v}
+                    {eq name='Think.get.is_vip' value='$key.""'}
+                    <option selected value="{$key}">{$v}</option>
+                    {else}
+                    <option value="{$key}">{$v}</option>
+                    {/eq}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> 搜 索</button>
+        </div>
+    </form>
+    <script>form.render()</script>
+</fieldset>

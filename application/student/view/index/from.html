@@ -1,0 +1,65 @@
+<form class="layui-form layui-card" action="{:request()->url()}" data-auto="true" method="post" autocomplete="off">
+    <div class="layui-card-body">
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">姓名</label>
+            <div class="layui-input-block">
+                <input name="name" value='{$vo.name|default=""}' required placeholder="请输入学生姓名" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label label-required">学号</label>
+            <div class="layui-input-block">
+                <input name="s_id" value='{$vo.s_id|default=""}' required placeholder="学号" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-select">
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">班级</label>
+                <div class="layui-input-inline">
+                    <select class="layui-select" name="c_id">
+                        {foreach $class as $v}
+                        {if isset($vo.c_id )&&$vo.c_id ==$v.id }
+                        <option selected value="{$v.id}">{$v.class_name}</option>
+                        {else}
+                        <option select="" value="{$v.id}">{$v.class_name}</option>
+                        {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-select">
+            <div class="layui-form-item layui-inline">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-inline">
+                    <select class="layui-select" name="sex">
+                        {foreach ['0'=>'女','1'=>'男'] as $k=>$v}
+                        {if isset($vo.sex )&&$vo.sex ==$k }
+                        <option selected value="{$k}">{$v}</option>
+                        {else}
+                        <option select="" value="{$k}">{$v}</option>
+                        {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="hr-line-dashed"></div>
+    {notempty name='vo.id'}<input type='hidden' value='{$vo.id}' name='id'>{/notempty}
+
+    <div class="layui-form-item text-center">
+        <button class="layui-btn" type='submit'>保存数据</button>
+        <button class="layui-btn layui-btn-danger" type='button' data-confirm="确定要取消编辑吗？" data-close>取消编辑</button>
+    </div>
+
+    <script>window.form.render();</script>
+
+</form>

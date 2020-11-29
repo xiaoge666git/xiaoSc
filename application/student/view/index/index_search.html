@@ -1,0 +1,64 @@
+<fieldset>
+
+    <legend>条件搜索</legend>
+
+    <form class="layui-form layui-form-pane form-search" action="{:request()->url()}" onsubmit="return false"
+          method="get" autocomplete="off">
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">学生姓名</label>
+            <div class="layui-input-inline">
+                <input name="name" value="{$Think.get.name|default=''}" placeholder="请输入学生姓名"
+                       class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">学号</label>
+            <div class="layui-input-inline">
+                <input name="s_id" value="{$Think.get.s_id|default=''}" placeholder="请输入学号"
+                       class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">班级</label>
+            <div class="layui-input-inline">
+                <select class="layui-select" name="c_id">
+                    <option value="">——所有——</option>
+                    {foreach $class as $v}
+                    {eq name='Think.get.c_id' value='$v.id'}
+                    <option selected value="{$v.id}">{$v.class_name}</option>
+                    {else}
+                    <option value="{$v.id}">{$v.class_name}</option>
+                    {/eq}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-inline">
+                <select class="layui-select" name="sex">
+                    {foreach [''=>'-- 所有 --','1'=>'男','0'=>'女'] as $k=>$v}
+                    {eq name='Think.get.sex' value='$k." "'}
+                    <option selected value="{$k}">{$v}</option>
+                    {else}
+                    <option value="{$k}">{$v}</option>
+                    {/eq}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i>
+                搜 索
+            </button>
+        </div>
+    </form>
+
+</fieldset>
+
+<script>form.render()</script>

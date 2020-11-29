@@ -1,0 +1,74 @@
+{extend name='admin@main'}
+
+{block name="button"}
+
+
+{if auth("add")}
+<button data-modal='{:url("add")}' data-title="添加学生" class='layui-btn layui-btn-sm layui-btn-primary'>添加学生</button>
+{/if}
+
+
+<button data-action='{:url("remove")}' data-rule="id#{key}" data-csrf="" data-confirm="确定要删除这些学生吗？"
+        class='layui-btn layui-btn-sm layui-btn-primary'>删除学生
+</button>
+
+
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='index/index_search'}
+    <table class="layui-table" lay-skin="line">
+
+        <thead>
+        <tr>
+            <th class='list-table-check-td think-checkbox'>
+                <label><input data-auto-none data-check-target='.list-check-box' type='checkbox'></label>
+            </th>
+
+            <th class='text-left nowrap'>学生姓名</th>
+            <th class='text-left nowrap'>学号</th>
+            <th class='text-left nowrap'>班级</th>
+            <th class='text-left nowrap'>性别</th>
+            <th class='text-left nowrap'>添加时间</th>
+            <th class='text-center nowrap'>操作</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {foreach $list as $k=>$vo}
+        <tr data-dbclick>
+            <td class='list-table-check-td think-checkbox'>
+                <label><input class="list-check-box" value='{$vo.id}' type='checkbox'></label>
+            </td>
+            <td class='text-left nowrap'>{$vo.name}</td>
+            <td class='text-left nowrap'>{$vo.s_id}</td>
+            <td class='text-left nowrap'>{$vo.class_name}</td>
+            <td class='text-left nowrap'>
+                {if $vo.sex==1}男
+                {else /}女
+                {/if}
+            </td>
+            <td class='text-left nowrap'>{$vo.create_at}</td>
+            <td class='text-center nowrap'>
+                {if auth("edit")}
+                <a data-dbclick class="layui-btn layui-btn-sm" data-title="编辑学生信息"
+                   data-modal='{:url("edit")}?id={$vo.id}'>编 辑</a>
+                {/if}
+                {if auth("remove")}
+                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除该学生吗？"
+                   data-action="{:url('remove')}" data-value="id#{$vo.id}" data-csrf="{:systoken('remove')}">删 除</a>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+
+{/block}
