@@ -1,8 +1,16 @@
 <?php
 
+namespace app\product\controller;
 
-class Product
+use library\Controller;
+
+class Product extends Controller
 {
+    protected $table = 'product';
 
-}2.git config user.name "someone"
-3.git config user.email "someone@someplace.com"
+    public function index()
+    {
+
+    }
+
+}
