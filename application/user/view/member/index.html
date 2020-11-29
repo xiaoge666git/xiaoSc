@@ -61,7 +61,8 @@
                 {/switch}
             </td>
             <td class='text-left nowrap'>{$vo.points}</td>
-            <td class='text-left nowrap'>{switch name="$vo.status"}
+            <td class='text-left nowrap'>
+                {switch name="$vo.status"}
                 {case value="0"}正常{/case}
                 {case value="1"}封禁{/case}
                 {/switch}

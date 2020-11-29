@@ -24,8 +24,12 @@ class Product extends Controller
     public function index()
     {
         $this->title = '商品信息管理';
-        $query = $this->_query($this->table)->equal('status,cate_id')->like('title');
-        $query->where(['is_deleted' => '0'])->order('sort desc,id desc')->page();
+        $query = $this->_query($this->table)
+            ->equal('status,cate_id')
+            ->like('title');
+        $query->where(['delete_time' => '0'])
+            ->order('id desc')
+            ->page();
     }
 
     /**
@@ -37,14 +41,16 @@ class Product extends Controller
      */
     protected function _index_page_filter(&$data)
     {
-        $this->clist = Db::name('StoreGoodsCate')->where(['is_deleted' => '0', 'status' => '1'])->select();
-        $list = Db::name('StoreGoodsList')->where('status', '1')->whereIn('goods_id', array_unique(array_column($data, 'id')))->select();
-
+        $this->clist = Db::name('sc_product_category')->where(['delete_time' => '0', 'status' => '0'])->select();
         foreach ($data as &$vo) {
-            list($vo['list'], $vo['cate']) = [[], []];
-            foreach ($list as $goods) if ($goods['goods_id'] === $vo['id']) array_push($vo['list'], $goods);
-            foreach ($this->clist as $cate) if ($cate['id'] === $vo['cate_id']) $vo['cate'] = $cate;
+            $vo['cate'] = [];
+            foreach ($this->clist as $cate) {
+                if ($cate['id'] === $vo['cate_id']) {
+                    $vo['cate'] = $cate['title'];
+                }
+            }
         }
+
     }
 
     /**
@@ -68,8 +74,8 @@ class Product extends Controller
             list($post, $data) = [$this->request->post(), []];
             if (isset($post['id']) && isset($post['goods_id']) && is_array($post['goods_id'])) {
                 foreach (array_keys($post['goods_id']) as $key) if ($post['goods_number'][$key] > 0) array_push($data, [
-                    'goods_id'     => $post['goods_id'][$key],
-                    'goods_spec'   => $post['goods_spec'][$key],
+                    'goods_id' => $post['goods_id'][$key],
+                    'goods_spec' => $post['goods_spec'][$key],
                     'number_stock' => $post['goods_number'][$key],
                 ]);
                 if (!empty($data)) {
@@ -95,7 +101,8 @@ class Product extends Controller
     {
         $this->title = '添加商品信息';
         $this->isAddMode = '1';
-        $this->_form($this->table, 'form');
+        $data['created_time']=time();
+        $this->_form($this->table, 'form','','',$data);
     }
 
     /**
@@ -111,7 +118,8 @@ class Product extends Controller
     {
         $this->title = '编辑商品信息';
         $this->isAddMode = '0';
-        $this->_form($this->table, 'form');
+        $data['updated_time']=time();
+        $this->_form($this->table, 'form','','',$data);
     }
 
     /**
@@ -125,26 +133,20 @@ class Product extends Controller
      */
     protected function _form_filter(&$data)
     {
-        // 生成商品ID
-        if (empty($data['id'])) $data['id'] = Data::uniqidNumberCode(14);
+
+
         if ($this->request->isGet()) {
-            $fields = 'goods_spec,goods_id,status,price_market market,price_selling selling,number_virtual `virtual`,number_express express';
-            $defaultValues = Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])->column($fields);
-            $this->defaultValues = json_encode($defaultValues, JSON_UNESCAPED_UNICODE);
-            $this->cates = Db::name('StoreGoodsCate')->where(['is_deleted' => '0', 'status' => '1'])->order('sort desc,id desc')->select();
+
+            $this->cates = Db::name('sc_product_category')->where(['delete_time' => '0', 'status' => '0'])->order('id desc')->select();
+
         } elseif ($this->request->isPost()) {
-            if (empty($data['logo'])) $this->error('商品LOGO不能为空，请上传图片');
-            if (empty($data['image'])) $this->error('商品展示图片不能为空，请上传图片');
-            Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])->update(['status' => '0']);
-            foreach (json_decode($data['lists'], true) as $vo) Data::save('StoreGoodsList', [
-                'goods_id'       => $data['id'],
-                'goods_spec'     => $vo[0]['key'],
-                'price_market'   => $vo[0]['market'],
-                'price_selling'  => $vo[0]['selling'],
-                'number_virtual' => $vo[0]['virtual'],
-                'number_express' => $vo[0]['express'],
-                'status'         => $vo[0]['status'] ? 1 : 0,
-            ], 'goods_spec', ['goods_id' => $data['id']]);
+            if (empty($data['imgs'])) $this->error('商品LOGO不能为空，请上传图片');
+            if (empty($data['title'])) $this->error('商品标题   不能为空，请上传图片');
+            if (empty($data['detail'])) $this->error('商品展示图片不能为空，请上传图片');
+            if (empty($data['price'])) $this->error('商品价格不能为空，请上传图片');
+            if (empty($data['vip_price'])) $this->error('商品vip价格不能为空，请上传图片');
+
+
         }
     }
 
@@ -160,14 +162,14 @@ class Product extends Controller
     }
 
     /**
-     * 禁用商品信息
+     * 禁用商品信息 下架
      * @auth true
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
     public function forbid()
     {
-        $this->_save($this->table, ['status' => '0']);
+        $this->_save($this->table, ['status' => '1']);
     }
 
     /**
@@ -178,7 +180,7 @@ class Product extends Controller
      */
     public function resume()
     {
-        $this->_save($this->table, ['status' => '1']);
+        $this->_save($this->table, ['status' => '0']);
     }
 
     /**
@@ -189,7 +191,8 @@ class Product extends Controller
      */
     public function remove()
     {
-        $this->_delete($this->table);
+        $this->applyCsrfToken();
+        $this->_save($this->table,['delete_time'=>time()]);
     }
 
 }
