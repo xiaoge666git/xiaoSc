@@ -45,7 +45,8 @@ class Product extends Controller
         foreach ($data as &$vo) {
             $vo['cate'] = [];
             foreach ($this->clist as $cate) {
-                if ($cate['id'] === $vo['cate_id']) {
+
+                if ($cate['id'] == $vo['cate_id']) {
                     $vo['cate'] = $cate['title'];
                 }
             }
@@ -101,10 +102,9 @@ class Product extends Controller
     {
         $this->title = '添加商品信息';
         $this->isAddMode = '1';
-        $data['created_time']=time();
-        $this->_form($this->table, 'form','','',$data);
+        $data['created_time'] = time();
+        $this->_form($this->table, 'form', '', '', $data);
     }
-
     /**
      * 编辑商品信息
      * @auth true
@@ -118,10 +118,9 @@ class Product extends Controller
     {
         $this->title = '编辑商品信息';
         $this->isAddMode = '0';
-        $data['updated_time']=time();
-        $this->_form($this->table, 'form','','',$data);
+        $data['updated_time'] = time();
+        $this->_form($this->table, 'form', '', '', $data);
     }
-
     /**
      * 表单数据处理
      * @param array $data
@@ -133,20 +132,14 @@ class Product extends Controller
      */
     protected function _form_filter(&$data)
     {
-
-
         if ($this->request->isGet()) {
-
             $this->cates = Db::name('sc_product_category')->where(['delete_time' => '0', 'status' => '0'])->order('id desc')->select();
-
         } elseif ($this->request->isPost()) {
             if (empty($data['imgs'])) $this->error('商品LOGO不能为空，请上传图片');
-            if (empty($data['title'])) $this->error('商品标题   不能为空，请上传图片');
+            if (empty($data['title'])) $this->error('商品标题不能为空，请上传图片');
             if (empty($data['detail'])) $this->error('商品展示图片不能为空，请上传图片');
             if (empty($data['price'])) $this->error('商品价格不能为空，请上传图片');
             if (empty($data['vip_price'])) $this->error('商品vip价格不能为空，请上传图片');
-
-
         }
     }
 
@@ -192,7 +185,7 @@ class Product extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
-        $this->_save($this->table,['delete_time'=>time()]);
+        $this->_save($this->table, ['delete_time' => time()]);
     }
 
 }

@@ -65,6 +65,8 @@ class ProductType extends Controller
      */
     public function forbid()
     {
+        $proType=$this->request->post('id');
+        db('sc_product')->where('id',$proType)->update(['status'=>1]);
         $this->_save($this->table, ['status' => '1']);
     }
 

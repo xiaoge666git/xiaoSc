@@ -106,7 +106,7 @@
                 {/if}
 
                 {if auth("remove")}
-                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?" data-csrf="{:systoken('remove')}"
+                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?" data-csrf="{:sytoken('remove')}"
                    data-action="{:url('remove')}" data-value="id#{$vo.id}">删 除</a>
                 {/if}
 

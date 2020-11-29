@@ -1,0 +1,43 @@
+<fieldset>
+    <legend>条件搜索</legend>
+    <form class="layui-form layui-form-pane form-search" action="{:request()->url()}" onsubmit="return false" method="get" autocomplete="off">
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">用户id</label>
+            <div class="layui-input-inline">
+                <input name="user_id" value="{$Think.get.user_id|default=''}" placeholder="用户id" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">商品id</label>
+            <div class="layui-input-inline">
+                <input name="pro_id" value="{$Think.get.pro_id|default=''}" placeholder="商品id" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item layui-inline">
+            <label class="layui-form-label">订单状态</label>
+            <div class="layui-input-inline">
+                <select class="layui-select" name="status" lay-search>
+<!--                    0 待付款 1 配送中 2 待收货 3 待评价-->
+                    {foreach [''=>'全部','0'=>'待付款','1'=>'配送中','2'=>'待收货','2'=>'待评价',] as $key=>$v}
+                    {eq name='Think.get.status' value='$key.""'}
+                    <option selected value="{$key}">{$v}</option>
+                    {else}
+                    <option value="{$key}">{$v}</option>
+                    {/eq}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+
+
+
+        <div class="layui-form-item layui-inline">
+            <button class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe615;</i> 搜 索</button>
+        </div>
+    </form>
+    <script>form.render()</script>
+</fieldset>

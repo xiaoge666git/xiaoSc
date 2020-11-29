@@ -1,0 +1,87 @@
+{extend name='admin@main'}
+
+
+
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='order/index_search'}
+    <table class="layui-table margin-top-10" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class='list-table-check-td think-checkbox'>
+                <label><input data-auto-none data-check-target='.list-check-box' type='checkbox'></label>
+            </th>
+
+            <th class='text-left nowrap'>订单id</th>
+            <th class='text-left nowrap'>用户名id</th>
+            <th class='text-left nowrap'>用户名</th>
+
+            <th class='text-left nowrap'>商品id</th>
+            <th class='text-left nowrap'>商品标题</th>
+
+            <th class='text-left nowrap'>数量</th>
+            <th class='text-left nowrap'>付款金额</th>
+
+            <th class='text-left nowrap'>订单状态</th>
+            <th class='text-left nowrap'>创建时间</th>
+            <th class='text-left nowrap'>操作</th>
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr data-dbclick>
+            <td class='list-table-check-td think-checkbox'>
+                <label><input class="list-check-box" value='{$vo.id}' type='checkbox'></label>
+            </td>
+
+            <td class='text-left nowrap'>{$vo.id}</td>
+            <td class='text-left nowrap'>{$vo.user_id}</td>
+            <td class='text-left nowrap'>{$vo.name}</td>
+
+            <td class='text-left nowrap'>{$vo.pro_id}</td>
+            <td class='text-left nowrap'>{$vo.title}</td>
+
+            <td class='text-left nowrap'>{$vo.num}</td>
+            <td class='text-left nowrap'>{$vo.pay_money}</td>
+
+
+            <td class='text-left nowrap'>
+                {switch name="$vo.status"}
+                {case value="0"}待付款{/case}
+                {case value="1"}配送中{/case}
+                {case value="2"}待收货{/case}
+                {case value="3"}待评价{/case}
+                {/switch}
+            </td>
+
+
+
+
+            <td class='text-left nowrap'>{$vo.created_time}</td>
+            <td class='text-left nowrap'>
+
+                <div class="nowrap margin-bottom-5">
+                    {if auth("edit")}
+                    <a data-dbclick class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={$vo.id}'>查看</a>
+                    {/if}
+                    {if $vo.status==0}
+                    {if auth("banned")}
+                    <a data-dbclick class="layui-btn layui-btn-sm" data-value="id#{$vo.id}"
+                       data-action='{:url("banned")}' data-csrf="{:systoken('banned')}">封禁</a>
+                    {/if}
+                    {/if}
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+
+{/block}
