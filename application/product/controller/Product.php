@@ -41,16 +41,24 @@ class Product extends Controller
      */
     protected function _index_page_filter(&$data)
     {
-        $this->clist = Db::name('sc_product_category')->where(['delete_time' => '0', 'status' => '0'])->select();
-        foreach ($data as &$vo) {
-            $vo['cate'] = [];
-            foreach ($this->clist as $cate) {
 
+        $this->clist = Db::name('sc_product_category')->where(['delete_time' => '0'])->select();
+        foreach ($data as &$vo) {
+
+            foreach ($this->clist as $cate) {
+//                var_dump($cate['id'] == $vo['cate_id']);
+//                var_dump($cate['id']);
+//                var_dump($vo['cate_id']);
                 if ($cate['id'] == $vo['cate_id']) {
                     $vo['cate'] = $cate['title'];
+
                 }
             }
+
+//            die();
         }
+
+
 
     }
 
@@ -173,6 +181,12 @@ class Product extends Controller
      */
     public function resume()
     {
+        $resP=db($this->table)->where('id',$this->request->post('id'))->find();
+        //分类没有禁用
+        $resT=db('sc_product_category')->where('id',$resP['cate_id'])->where('status',0)->find();
+        if (is_null($resT)){
+            $this->error('该商品分类被禁用');
+        }
         $this->_save($this->table, ['status' => '0']);
     }
 

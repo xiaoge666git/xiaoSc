@@ -54,8 +54,8 @@
                 {case value="1"}下架中{/case}
                 {/switch}
             </td>
-
             <td class='text-left nowrap'>{$vo.cate}</td>
+
 
             <td class='text-left nowrap'>
                 {switch name="$vo.size"}
@@ -106,7 +106,7 @@
                 {/if}
 
                 {if auth("remove")}
-                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?" data-csrf="{:sytoken('remove')}"
+                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?" data-csrf="{:systoken('remove')}"
                    data-action="{:url('remove')}" data-value="id#{$vo.id}">删 除</a>
                 {/if}
 

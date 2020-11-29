@@ -64,9 +64,10 @@ class ProductType extends Controller
      * @throws \think\exception\PDOException
      */
     public function forbid()
-    {
+    {   //同时也下架该分类下的商品
         $proType=$this->request->post('id');
-        db('sc_product')->where('id',$proType)->update(['status'=>1]);
+
+        db('sc_product')->where('cate_id','eq',intval($proType))->update(['status'=>1]);
         $this->_save($this->table, ['status' => '1']);
     }
 
