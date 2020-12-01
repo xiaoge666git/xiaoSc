@@ -1,0 +1,51 @@
+{extend name='admin@main'}
+
+{block name="button"}
+
+
+
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='user_coupon/index_search'}
+    <table class="layui-table margin-top-10" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class='text-left nowrap'>id</th>
+
+            <th class='text-left nowrap'>用户id</th>
+            <th class='text-left nowrap'>用户账号</th>
+
+            <th class='text-left nowrap'>优惠券id</th>
+            <th class='text-left nowrap'>优惠券标题</th>
+
+            <th class='text-left nowrap'>创建时间</th>
+
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr data-dbclick>
+
+            <td class='text-left nowrap'>{$vo.id}</td>
+
+            <td class='text-left nowrap'>{$vo.user_id}</td>
+            <td class='text-left nowrap'>{$vo.user_name}</td>
+
+            <td class='text-left nowrap'>{$vo.coupon_id}</td>
+            <td class='text-left nowrap'>{$vo.cou_title}</td>
+
+            <td class='text-left nowrap'>{$vo.created_time}</td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+
+</div>
+
+{/block}

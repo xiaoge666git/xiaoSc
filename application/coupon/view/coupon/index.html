@@ -1,0 +1,92 @@
+{extend name='admin@main'}
+
+{block name="button"}
+{if auth("add")}
+<button data-modal='{:url("add")}' data-title="添加商品分类" class='layui-btn layui-btn-sm layui-btn-primary'>添加优惠券</button>
+{/if}
+{if auth("remove")}
+<button data-action='{:url("remove")}' data-rule="id#{key}" class='layui-btn layui-btn-sm layui-btn-primary'>删除优惠券
+</button>
+{/if}
+{/block}
+
+{block name="content"}
+<div class="think-box-shadow">
+    {include file='coupon/index_search'}
+    <table class="layui-table margin-top-10" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class='list-table-check-td think-checkbox'>
+                <input data-auto-none data-check-target='.list-check-box' type='checkbox'>
+            </th>
+
+            <th class='text-left nowrap'>优惠券id</th>
+            <th class='text-left nowrap'>优惠券标题</th>
+            <th class='text-left nowrap'>商品id</th>
+            <th class='text-left nowrap'>商品标题</th>
+
+            <th class="text-left">满减金额</th>
+            <th class="text-left">优惠数量</th>
+            <th class="text-left">优惠券图片</th>
+            <th class="text-left">创建时间</th>
+            <th class="text-left">操作</th>
+
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr>
+            <td class='list-table-check-td think-checkbox'>
+                <input class="list-check-box" value='{$vo.id}' type='checkbox'>
+            </td>
+
+            <td class='text-left nowrap'>
+                {$vo.id|default=''}
+            </td>
+            <td class='text-left nowrap'>
+                {$vo.title|default=''}
+            </td>
+            <td class='text-left nowrap'>
+                {$vo.product_id|default=''}
+            </td>
+            <td class='text-left nowrap'>
+                {$vo.product_title|default=''}
+            </td>
+
+
+
+
+            <td class='text-left nowrap'>
+                {$vo.meet_num|default=''}
+            </td>
+            <td class='text-left nowrap'>
+                {$vo.cut_num|default=''}
+            </td>
+
+            <td class='text-left nowrap'>
+                <img data-tips-image style="width:60px;height:60px" src="{$vo.img|default=''}" class="margin-right-5 text-top">
+            </td>
+
+
+            <td class='text-left nowrap'>{$vo.created_time}</td>
+            <td class='text-left nowrap'>
+
+                {if auth("edit")}
+                <a data-title="编辑商品分类" class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={$vo.id}'>编 辑</a>
+                {/if}
+
+                {if auth("remove")}
+                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?"
+                   data-action="{:url('remove')}" data-value="id#{$vo.id}" data-csrf="{:systoken('remove')}">删 除</a>
+                {/if}
+
+            </td>
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+</div>
+{/block}

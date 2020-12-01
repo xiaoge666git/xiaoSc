@@ -109,8 +109,7 @@
                 <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?" data-csrf="{:systoken('remove')}"
                    data-action="{:url('remove')}" data-value="id#{$vo.id}">删 除</a>
                 {/if}
-
-
+                <a class="layui-btn layui-btn-sm" data-open="{:url('coupon/coupon/index')}?product_id={$vo.id}">查看优惠券</a>
             </td>
         </tr>
         {/foreach}

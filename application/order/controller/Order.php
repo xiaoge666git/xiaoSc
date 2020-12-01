@@ -28,4 +28,12 @@ class Order extends Controller
             $val['title'] = $resp['title'];
         }
     }
+
+    //发货
+    public function shipments()
+    {
+        $this->applyCsrfToken();
+        $this->_save($this->table, ['status' => 2]);
+
+    }
 }

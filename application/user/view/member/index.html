@@ -85,6 +85,8 @@
                     <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除该学生吗？"
                        data-action="{:url('remove')}" data-value="id#{$vo.id}" data-csrf="{:systoken('remove')}">删 除</a>
                     {/if}
+                    <a class="layui-btn layui-btn-sm" data-open="{:url('coupon/coupon/index')}?user_id={$vo.id}">查看优惠券</a>
+                    <a class="layui-btn layui-btn-sm" data-open="{:url('shopping_car/shopping_car/index')}?user_id={$vo.id}">查看购物车</a>
 
                 </div>
             </td>

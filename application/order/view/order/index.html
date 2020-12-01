@@ -53,7 +53,7 @@
                 {case value="0"}待付款{/case}
                 {case value="1"}配送中{/case}
                 {case value="2"}待收货{/case}
-                {case value="3"}待评价{/case}
+                {case value="3"}已收货{/case}
                 {/switch}
             </td>
 
@@ -64,15 +64,12 @@
             <td class='text-left nowrap'>
 
                 <div class="nowrap margin-bottom-5">
-                    {if auth("edit")}
-                    <a data-dbclick class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={$vo.id}'>查看</a>
+                    {eq name="vo.status" value="1"}
+                    {if auth("shipments")}
+                    <a data-dbclick class="layui-btn layui-btn-sm" data-csrf="{:systoken('shipments')}" data-value="id#{$vo.id}" data-action="{:url('shipments')}">开始配送</a>
                     {/if}
-                    {if $vo.status==0}
-                    {if auth("banned")}
-                    <a data-dbclick class="layui-btn layui-btn-sm" data-value="id#{$vo.id}"
-                       data-action='{:url("banned")}' data-csrf="{:systoken('banned')}">封禁</a>
-                    {/if}
-                    {/if}
+                    {/eq}
+
                 </div>
             </td>
         </tr>

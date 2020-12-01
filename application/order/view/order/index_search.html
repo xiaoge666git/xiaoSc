@@ -21,7 +21,7 @@
             <div class="layui-input-inline">
                 <select class="layui-select" name="status" lay-search>
 <!--                    0 待付款 1 配送中 2 待收货 3 待评价-->
-                    {foreach [''=>'全部','0'=>'待付款','1'=>'配送中','2'=>'待收货','2'=>'待评价',] as $key=>$v}
+                    {foreach [''=>'全部','0'=>'待付款','1'=>'配送中','2'=>'待收货','3'=>'已收货',] as $key=>$v}
                     {eq name='Think.get.status' value='$key.""'}
                     <option selected value="{$key}">{$v}</option>
                     {else}
@@ -31,8 +31,6 @@
                 </select>
             </div>
         </div>
-
-
 
 
         <div class="layui-form-item layui-inline">
