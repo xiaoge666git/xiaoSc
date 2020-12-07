@@ -1,0 +1,41 @@
+{extend name='admin@main'}
+
+
+{block name="content"}
+<div class="think-box-shadow">
+
+    <form action="">
+        <div class="layui-row">
+            <div class="layui-col-md3 ">{$res[0]['configuration']}</div>
+            <div class="layui-col-md3"><input class="layui-input" type="number" name="money_than_poing"
+                                              value="{$res[0]['config_val']}">
+            </div>
+        </div>
+
+        <input class="layui-btn" id="btn" type="submit" value="修改">
+    </form>
+
+</div>
+<script type="text/javascript">
+
+    layui.use(['jquery', 'layer'], function(){
+
+        var $ = layui.$ //重点处
+
+        $('#btn').on('click',function () {
+            console.log('hello');
+            // $val1=$("input[name='money_than_poing']").val();
+            // $val2=$("input[name='vip_config']").val();
+            $.ajax({
+                url:"{:url('sc_config/sc_config/edit')}",
+                type:"POST",
+                data:$('form').serialize(),
+                dataType:"json",
+            })
+        })
+
+    });
+</script>
+
+{/block}
+

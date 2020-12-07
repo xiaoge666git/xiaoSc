@@ -12,7 +12,7 @@
         <div class="layui-row margin-bottom-15">
             <label class="layui-col-xs2 think-form-label">满减条件金额</label>
             <label class="layui-col-xs10">
-                <input name="meet_num" required value='{$vo.meet_num|default=""}' placeholder="满减条件金额"
+                <input name="money" required value='{$vo.money|default=""}' placeholder="满减条件金额"
                        class="layui-input">
             </label>
         </div>
@@ -20,7 +20,7 @@
         <div class="layui-row margin-bottom-15">
             <label class="layui-col-xs2 think-form-label">优惠数量</label>
             <label class="layui-col-xs10">
-                <input name="cut_num" required value='{$vo.cut_num|default=""}' placeholder="满减条件金额"
+                <input name="cut_money" required value='{$vo.cut_money|default=""}' placeholder="优惠数量"
                        class="layui-input">
             </label>
         </div>
@@ -30,14 +30,6 @@
             <label class="layui-col-xs10">
                 <input name="img" type="hidden" value="{$vo.img|default=''}">
                 <script>$('[name="img"]').uploadOneImage()</script>
-            </label>
-        </div>
-
-        <div class="layui-row margin-bottom-15">
-            <label class="layui-col-xs2 think-form-label">商品id</label>
-            <label class="layui-col-xs10">
-                <input name="product_id" required value='{$vo.product_id|default=""}' placeholder="优惠商品id"
-                       class="layui-input">
             </label>
         </div>
 

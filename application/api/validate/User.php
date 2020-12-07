@@ -9,7 +9,7 @@ class User extends Validate
     protected $rule = [
         'name' => 'require|max:10',
         'password' => 'require|length:4,16|confirm',
-        'nick_name' => 'require|length:4,16',
+        'nick_name' => 'require|length:1,16',
         'repassword' => 'require|confirm:password'
     ];
 
@@ -24,6 +24,7 @@ class User extends Validate
 
     protected $scene = [
         'login' => ['name', 'password'],
-        'register' => ['name', 'passowrd', 'repassword']
+        'register' => ['name', 'passowrd', 'repassword'],
+        'edit'=>['nick_name']
     ];
 }

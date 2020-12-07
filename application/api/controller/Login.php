@@ -35,6 +35,7 @@ class Login extends Base
                 'money' => $res['money'],
                 'points' => $res['points'],
             ];
+
             $this->ajaxReturn(['error_code' => 1, 'msg' => '登录成功', 'data' =>$data]);
         }
 
@@ -53,7 +54,7 @@ class Login extends Base
      }else{
          $vauser=validate('User');
 
-         if ($result=$vauser->scene('login')->check(['name'=>$name,'password'=>$pwd,'repassword'=>$repwd])){
+         if ($vauser->scene('login')->check(['name'=>$name,'password'=>$pwd,'repassword'=>$repwd])){
 
              $res=db('sc_user')->insert(['name'=>$name,'password'=>$pwd]);
 
@@ -71,6 +72,7 @@ class Login extends Base
     //退出登录
     public function loginout(){
         session('u_id', null, 'xiao');
+        self::$userInfo=[];
         $this->ajaxReturn(['error_code'=>1,'msg'=>'退出成功']);
 //        $this->request('/mobie/login');
     }

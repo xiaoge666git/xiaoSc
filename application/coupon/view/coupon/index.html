@@ -23,8 +23,7 @@
 
             <th class='text-left nowrap'>优惠券id</th>
             <th class='text-left nowrap'>优惠券标题</th>
-            <th class='text-left nowrap'>商品id</th>
-            <th class='text-left nowrap'>商品标题</th>
+
 
             <th class="text-left">满减金额</th>
             <th class="text-left">优惠数量</th>
@@ -48,21 +47,12 @@
             <td class='text-left nowrap'>
                 {$vo.title|default=''}
             </td>
+
             <td class='text-left nowrap'>
-                {$vo.product_id|default=''}
+                {$vo.money|default=''}
             </td>
             <td class='text-left nowrap'>
-                {$vo.product_title|default=''}
-            </td>
-
-
-
-
-            <td class='text-left nowrap'>
-                {$vo.meet_num|default=''}
-            </td>
-            <td class='text-left nowrap'>
-                {$vo.cut_num|default=''}
+                {$vo.cut_money|default=''}
             </td>
 
             <td class='text-left nowrap'>

@@ -1,0 +1,25 @@
+{extend name='admin@main'}
+
+
+{block name="content"}
+<div class="think-box-shadow">
+
+    <form action="{:url('edit')}">
+        <div class="layui-row">
+            <div class="layui-col-md3 ">{$res[0]['configuration']}</div>
+            <div class="layui-col-md3"><input class="layui-input" type="text" name="money_than_poing"
+                                              value="{$res[0]['config_val']}">
+            </div>
+        </div>
+
+        <input class="layui-btn" type="submit" value="修改">
+    </form>
+
+</div>
+
+{/block}
+
+<script>
+
+</script>
+

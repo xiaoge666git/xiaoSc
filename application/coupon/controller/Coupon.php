@@ -19,21 +19,21 @@ class Coupon extends Controller
             ->page();
     }
 
-    /**
-     * 数据列表处理
-     * @param array $data
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    protected function _index_page_filter(&$data)
-    {
-
-        foreach ($data as &$vo) {
-            $res = db('sc_product')->where('id', $vo['product_id'])->find();
-            $vo['product_title'] = $res['title'];
-        }
-    }
+//    /**
+//     * 数据列表处理
+//     * @param array $data
+//     * @throws \think\db\exception\DataNotFoundException
+//     * @throws \think\db\exception\ModelNotFoundException
+//     * @throws \think\exception\DbException
+//     */
+//    protected function _index_page_filter(&$data)
+//    {
+//
+//        foreach ($data as &$vo) {
+//            $res = db('sc_product')->where('id', $vo['product_id'])->find();
+//            $vo['product_title'] = $res['title'];
+//        }
+//    }
 
 
     public function add()
