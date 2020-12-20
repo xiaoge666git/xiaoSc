@@ -42,11 +42,11 @@ class Coupon extends Controller
         if ($this->request->isGet()) {
             $this->_form($this->table, 'form');
         } else {
-            $pid = $this->request->post('product_id');
-            $res=db('sc_product')->where('id',$pid)->where('delete_time',0)->find();
-            if(empty($res)){
-                $this->error('没有该商品');
-            }
+//            $pid = $this->request->post('product_id');
+//            $res=db('sc_product')->where('id',$pid)->where('delete_time',0)->find();
+//            if(empty($res)){
+//                $this->error('没有该商品');
+//            }
             $data['created_time'] = time();
             $this->_form($this->table, 'form', '', '', $data);
         }

@@ -9,11 +9,13 @@ class Home extends Base
 
     public function index()
     {
+//        var_dump($this->userInfo);
+//        die();
 //轮播图
         $banner = db('sc_banner')
             ->where('delete_time', 0)
             ->limit(4)
-            ->field('p_id,img_url banner_img')
+            ->field('id,p_id,img_url banner_img')
             ->select();
 
         //优惠券
@@ -28,14 +30,15 @@ class Home extends Base
             ->where('status', 0)
             ->where('delete_time', 0)
             ->limit(9)
-            ->field('id p_id,imgs pro_img,price')
+            ->field('id p_id,imgs pro_img,price,title')
             ->select();
+
         //for_you_product:[//为你精选
         $forYou = db('sc_product')
             ->where('status', 0)
             ->where('delete_time', 0)
             ->limit(12)
-            ->field('id p_id,imgs pro_img,price')
+            ->field('id p_id,imgs pro_img,price,title   ')
             ->select();
 
 

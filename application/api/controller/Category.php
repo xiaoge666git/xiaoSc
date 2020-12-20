@@ -26,7 +26,7 @@ class Category extends Base
         $cate_id = input('get.cate_id', 0, 'intval');
         $pagesize = input('get.pagesize', 10, 'intval');
         $page = input('get.page', 1, 'intval');
-        $offset=($page-1)*$pagesize;
+        $offset = ($page - 1) * $pagesize;
         if ($cate_id == 0) {
             $rtData['error_code'] = 1;
             $rtData['msg'] = '参数错误';
@@ -36,8 +36,8 @@ class Category extends Base
             ->where('status', 0)
             ->where('cate_id', $cate_id)
             ->where('delete_time', 0)
-            ->field('id,title,imgs as p_img')
-            ->limit($offset,$pagesize)
+            ->field('id,title,imgs as p_img,price')
+            ->limit($offset, $pagesize)
             ->select();
         $rtData['error_code'] = 0;
         $rtData['data']['pro_list'] = $res;

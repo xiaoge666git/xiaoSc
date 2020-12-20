@@ -1,0 +1,56 @@
+{extend name='admin@main'}
+
+{block name="button"}
+
+{if auth('add')}
+<button data-modal='{:url("add")}' data-title="添加配置" class='layui-btn layui-btn-sm layui-btn-primary'>添加配置</button>
+{/if}
+
+{/block}
+
+{block name="content"}
+
+<div class="think-box-shadow">
+
+    <table class="layui-table margin-top-10" lay-skin="line">
+        {notempty name='list'}
+        <thead>
+        <tr>
+            <th class="text-left nowrap">id</th>
+            <th class='text-left nowrap'>实际获得金额</th>
+            <th class='text-left nowrap'>充值金额</th>
+            <th class='text-left nowrap'>优惠比</th>
+            <th class='text-left nowrap'>创建时间</th>
+            <th class="text-left nowrap">操作</th>
+        </tr>
+        </thead>
+        {/notempty}
+        <tbody>
+        {foreach $list as $key=>$vo}
+        <tr data-dbclick>
+
+
+            <td class='text-left nowrap'>{$vo.id}</td>
+            <td class="text-left nowrap">{$vo.get_money}</td>
+            <td class="text-left nowrap">{$vo.recharge_money}</td>
+            <td class="text-left nowrap">{$vo.get_money/$vo.recharge_money}</td>
+            <td class="text-left nowrap">{$vo.created_time|date='Y-m-d H:i:s'}</td>
+            <td class='text-left nowrap'>
+                {if auth("edit")}
+                <a data-dbclick data-title="编辑" class="layui-btn layui-btn-sm" data-modal='{:url("edit")}?id={$vo.id}'>编
+                    辑</a>
+                {/if}
+                {if auth("remove")}
+                <a class="layui-btn layui-btn-sm layui-btn-danger" data-confirm="确定要删除数据吗?"
+                   data-action="{:url('remove')}" data-value="id#{$vo.id}" data-csrf="{:systoken('remove')}">删 除</a>
+                {/if}
+            </td>
+
+        </tr>
+        {/foreach}
+        </tbody>
+    </table>
+    {empty name='list'}<span class="notdata">没有记录哦</span>{else}{$pagehtml|raw|default=''}{/empty}
+</div>
+
+{/block}
