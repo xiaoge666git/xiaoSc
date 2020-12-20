@@ -66,19 +66,95 @@ class My extends Base
             $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误']);
         }
 
-        if($this->userInfo['vip_validity_time']>time()){
+        if ($this->userInfo['vip_validity_time'] > time()) {
             db('sc_user')->where('id', $this->userInfo['id'])->setInc('vip_validity_time', $vres['days'] * 84600);
-        }else{
-            db('sc_user')->where('id', $this->userInfo['id'])->update(['vip_validity_time'=> intval(time())+($vres['days'] * 84600)]);
+        } else {
+            db('sc_user')->where('id', $this->userInfo['id'])->update(['vip_validity_time' => intval(time()) + ($vres['days'] * 84600)]);
 
+        }
+        db('sc_user')->where('id', $this->userInfo['id'])->setInc('money', $rres['get_money']);
+        $msg = '花费' . $vres['price'] . '购买' . $vres['days'] . '天会员成功  ' . '花费' . $rres['recharge_money'] . '元 充入平台得到' . $rres['get_money'];
+        $this->ajaxReturn(['error_code' => 0, 'msg' => $msg]);
+    }
+
+    //我的订单接口
+    public function myorder()
+    {
+
+        $pagesize = input('get.pagesize', 10, 'intval');
+        $page = input('get.page', 1, 'intval');
+        $offset = ($page - 1) * $pagesize;
+        $type = input('get.type', '-1', 'intval');// -1 全部  0 待付款 1 配送中 2 待收货 3 待评价
+
+        if (in_array($type, [-1.0, 1, 2, 3])) {
+            $query = db('sc_order')
+                ->alias('o')
+                ->leftJoin('sc_product p', 'o.pro_id=p.id')
+                ->where('o.user_id', $this->userInfo['id'])
+                ->where('o.delete_time', 0)
+                ->limit($offset, $pagesize)
+                ->field('o.pro_id,o.pay_money,o.status,o.num,p.size,p.price,p.imgs,p.describe,p.title');
+            $orders = null;
+            switch ($type) {
+                case -1:
+                    {
+                        $orders = $query->select();
+                        break;
+                    };
+                case 0:
+                    {
+                        $orders = $query->where('o.status', 0)->select();
+                        break;
+                    };
+                case 1:
+                    {
+                        $orders = $query->where('o.status', 1)->select();
+                        break;
+                    };
+                case 2:
+                    {
+                        $orders = $query->where('o.status', 2)->select();
+                        break;
+                    };
+                case 3:
+                    {
+                        $orders = $query->where('o.status', 3)->select();
+                        break;
+                    };
+            }
+            foreach ($orders as &$item) {
+                $item['sc_name'] = '小肖的衣服店';
+                $item['describe'] = strip_tags($item['describe']);
+                $item['describe'] = substr($item['describe'], 0, 40);
+                //衣服尺码 0 S, 1 N, 2 L,3 XL,4 XXL
+                if ($item['size'] == 0) {
+                    $item['size'] = 'S';
+                }
+
+                if ($item['size'] == 1) {
+                    $item['size'] ='N';
+                }
+                if ($item['size'] == 2) {
+                    $item['size'] = 'L';
+                }
+                if ($item['size'] == 3) {
+                    $item['size'] = 'XL';
+                }
+                if ($item['size'] == 4) {
+                    $item['size'] = 'XXL';
+                }
+
+            }
+
+
+            $this->ajaxReturn(['error_code' => 0, 'data' => ['order_list' => $orders]]);
+
+
+        } else {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误']);
         }
 
 
-        db('sc_user')->where('id', $this->userInfo['id'])->setInc('money', $rres['get_money']);
-
-        $msg = '花费' . $vres['price'] . '购买' . $vres['days'] . '天会员成功  ' . '花费' . $rres['recharge_money'] . '元 充入平台得到' . $rres['get_money'];
-        $this->ajaxReturn(['error_code' => 0, 'msg' => $msg]);
-
-
     }
+
 }
