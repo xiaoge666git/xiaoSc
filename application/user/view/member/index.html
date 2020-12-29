@@ -24,6 +24,8 @@
             <th class='text-left nowrap' >账号名</th>
             <th class='text-left nowrap'>性别</th>
             <th class='text-left nowrap'>头像</th>
+            <th class='text-left nowrap'>电话号</th>
+
             <th class='text-left nowrap'>金额</th>
             <th class='text-left nowrap'>是否会员</th>
             <th class='text-left nowrap'>积分</th>
@@ -53,6 +55,7 @@
                      class="margin-right-5 text-top">
             </td>
 
+            <td class='text-left nowrap'>{$vo.phone}</td>
             <td class='text-left nowrap'>{$vo.money}</td>
             <td class='text-left nowrap'>{switch name="$vo.is_vip"}
                 {case value="0"}不是{/case}

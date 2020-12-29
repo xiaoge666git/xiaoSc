@@ -44,4 +44,5 @@ class Base extends Controller
         exit(json_encode($data));
     }
 
+
 }

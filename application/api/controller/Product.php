@@ -71,5 +71,72 @@ class Product extends Base
         $this->ajaxReturn($rtData);
     }
 
+    //获取商品信息 下单界面
+    public function proInfo()
+    {
+
+        //isCollect
+        $id = input('get.id', 0, 'intval');
+        $res = db('sc_product')
+            ->where('id', $id)
+            ->where('delete_time', 0)
+            ->where('status', 0)
+            ->field('id,title,describe,sale_num,detail,price')
+            ->find();
+
+        $imgarr = explode('|', $res['detail']);
+        $res['detail'] = $imgarr;
+        $res['describe']=strip_tags( $res['describe']);
+        $isCollect=db('sc_collect')->where('user_id',$this->userInfo['id'])->where('pro_id',$id)->where('delete_time',0)->count();
+        $res['isCollect']=boolval($isCollect);
+        $rtData['error_code'] = 0;
+
+        $rtData['data']['product'] = $res;
+        $this->ajaxReturn($rtData);
+    }
+
+    //未付款order的信息展示
+    public function noPayOrder(){
+  //用户电话及地址信息
+        $oid=input('get.oid',0,'intval');
+
+        $user=[
+            'nick_name'=>$this->userInfo['nick_name'],
+            'phone'=>$this->userInfo['phone'],
+            'address'=>$this->userInfo['address'],
+
+        ];
+        $order=db('sc_order')
+            ->alias('o')
+            ->leftJoin('sc_product p','o.pro_id=p.id')
+            ->field('p.imgs,p.title,p.price,p.size,o.pay_money,o.num,p.id pid,o.id oid')
+            ->where('o.id',$oid)
+            ->find();
+        if ($order['size'] == 0) {
+            $order['size'] = 'S';
+        }
+
+        if ($order['size'] == 1) {
+            $order['size'] = 'N';
+        }
+        if ($order['size'] == 2) {
+            $order['size'] = 'L';
+        }
+        if ($order['size'] == 3) {
+            $order['size'] = 'XL';
+        }
+        if ($order['size'] == 4) {
+            $order['size'] = 'XXL';
+        }
+
+        $coupon=db('sc_user_coupon')
+            ->alias('uc')
+            ->leftJoin('sc_coupon c','uc.coupon_id=c.id')
+            ->where('c.money','<=',$order['pay_money'])
+            ->where('uc.num','>',0)
+            ->field('uc.id,c.money,c.cut_money')
+            ->select();
+        $this->ajaxReturn(['error_code'=>0,'data'=>['user'=>$user,'order'=>$order,'coupon'=>$coupon]]);
+    }
 
 }

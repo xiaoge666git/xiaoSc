@@ -5,20 +5,60 @@ namespace app\api\controller;
 
 
 use app\api\validate\User;
+use think\Db;
+use think\Session;
 
 class My extends Base
 {
+
+//获取用户信息
+    public function getinfo()
+    {
+        $res = db('sc_user')->where('id', $this->userInfo['id'])->field('id,nick_name,phone,address,sex,profile_picture')->find();
+        $this->ajaxReturn(['error_code' => 0, 'data' => ['userinfo' => $res]]);
+    }
+
+//头像上传接口
+    public function headerImgUp()
+    {
+        $files = $this->request->file('headimg');
+        $host = 'http://' . $_SERVER['SERVER_NAME'] . '/upload/userhead/';
+        $info = $files->validate(['size' => 50000, 'ext' => 'jpg,png,gif'])->move('../public/upload/userhead');
+        if ($info) {
+            $url = str_replace('\\', '/', $host . $info->getSaveName());
+            $this->ajaxReturn(['error_code' => 0, 'data' => ['imgurl' => $url]]);
+//            $this->ajaxReturn($url);
+        } else {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => $files->getError()]);
+        }
+
+    }
+
+    public function index()
+    {
+        $resdata = db('sc_user')->where('id', $this->userInfo['id'])->field('id,nick_name,money,points,profile_picture')->find();
+
+        $couponnum = db('sc_user_coupon')->where('delete_time', 0)->where('user_id', $this->userInfo['id'])->count();
+        $resdata['c_num'] = $couponnum;
+
+        $this->ajaxReturn(['error_code' => 0, 'data' => ['user' => $resdata]]);
+
+    }
+
     //用户信息编辑
     public function edit()
     {
         $nick_name = input('post.nick_name', '', 'trim');
         $sex = input('post.sex', '', 'intval');
         $head_img = input('post.head_img', '', 'trim');
+        $phone = input('post.phone', '', 'trim');
+        $address = input('post.address', '', 'trim');
 //        var_dump($nick_name);
 //        die();
         $vauser = validate('user');
-        if ($vauser->scene('edit')->check(['nick_name' => $nick_name]) && ($sex == 1 || $sex == 2)) {
-            db('sc_user')->where('id', $this->userInfo['id'])->update(['nick_name' => $nick_name, 'sex' => $sex, 'profile_picture' => $head_img]);
+        if ($vauser->scene('edit')->check(['nick_name' => $nick_name]) && ($sex == 1 || $sex == 2 || $sex == 0)) {
+            db('sc_user')->where('id', $this->userInfo['id'])
+                ->update(['nick_name' => $nick_name, 'sex' => $sex, 'profile_picture' => $head_img, 'phone' => $phone, 'address' => $address]);
             $this->ajaxReturn(['error_code' => 0, 'msg' => "编辑成功"]);
 
         } else {
@@ -86,7 +126,7 @@ class My extends Base
         $offset = ($page - 1) * $pagesize;
         $type = input('get.type', '-1', 'intval');// -1 全部  0 待付款 1 配送中 2 待收货 3 待评价
 
-        if (in_array($type, [-1.0, 1, 2, 3])) {
+        if (in_array($type, [-1, 0, 1, 2, 3])) {
             $query = db('sc_order')
                 ->alias('o')
                 ->leftJoin('sc_product p', 'o.pro_id=p.id')
@@ -132,7 +172,7 @@ class My extends Base
                 }
 
                 if ($item['size'] == 1) {
-                    $item['size'] ='N';
+                    $item['size'] = 'N';
                 }
                 if ($item['size'] == 2) {
                     $item['size'] = 'L';
@@ -156,5 +196,142 @@ class My extends Base
 
 
     }
+
+//收藏商品跟取消收藏
+    public function collection()
+    {
+        $pid = input('post.pid', 0, 'intval');
+        if (!$pid) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误']);
+        }
+        $res = db('sc_collect')->where('user_id', $this->userInfo['id'])->where('pro_id', $pid)->where('delete_time', 0)->select();
+        if (empty($res)) {
+            db('sc_collect')->insert([
+                'user_id' => $this->userInfo['id'],
+                'pro_id' => $pid,
+                'created_time' => time()
+            ]);
+        } else {
+            db('sc_collect')->where('user_id', $this->userInfo['id'])->where('pro_id', $pid)->update(['delete_time' => time()]);
+        }
+
+    }
+
+//我的收藏列表
+    public function mycollection()
+    {
+        $pagesize = input('get.pageSize', 10, 'intval');
+        $page = input('get.page', 1, 'intval');
+        $offset = ($page - 1) * $pagesize;
+        $mycoll = db('sc_collect')
+            ->alias('c')
+            ->leftJoin('sc_product p', 'c.pro_id=p.id')
+            ->field('p.id,p.imgs,p.title,p.sale_num,p.price')
+            ->where('user_id', $this->userInfo['id'])
+            ->limit($offset, $pagesize)
+            ->select();
+        if (empty($mycoll)) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '您还没有收藏商品，去逛逛吧']);
+        } else {
+            $this->ajaxReturn(['error_code' => 0, 'data' => ['col_list' => $mycoll]]);
+        }
+    }
+
+    //我的优惠券列表
+    public function mycoupon()
+    {
+
+        $pagesize = input('get.pageSize', 10, 'intval');
+        $page = input('get.page', 1, 'intval');
+        $offset = ($page - 1) * $pagesize;
+        $coupon_list = db('sc_user_coupon')
+            ->alias('uc')
+            ->leftJoin('sc_coupon c', 'uc.coupon_id=c.id')
+            ->where('uc.delete_time', 0)
+            ->where('uc.user_id', $this->userInfo['id'])
+            ->field('c.money,c.cut_money')
+            ->limit($offset, $pagesize)
+            ->select();
+        $this->ajaxReturn(['error_code' => 0, 'data' => ['my_col' => $coupon_list]]);
+    }
+
+    //收藏与取消收藏
+    public function collPor()
+    {
+        $pid = input('post.id', 0, 'intval');
+        $res = db('sc_collect')->where('user_id', $this->userInfo['id'])->where('pro_id', $pid)->find();
+        if (empty($res)) {
+            db('sc_collect')->insert([
+                'user_id' => $this->userInfo['id'],
+                'pro_id' => $pid
+            ]);
+        } else {
+
+            db('sc_collect')->where('user_id', $this->userInfo['id'])->where('pro_id', $pid)->delete();
+        }
+
+        $this->ajaxReturn(['error_code' => 0, 'msg' => '操作成功']);
+    }
+
+    //用户下单接口
+    public function downOrder()
+    {
+        $pid = input('post.pid', 0, 'intval');
+        $num = input('post.num', 1, 'intval');
+        $price = db('sc_product')->where('id', $pid)->find();
+
+        $oId = db('sc_order')->insertGetId(
+            [
+                'user_id' => $this->userInfo['id'],
+                'pro_id' => $pid,
+                'num' => $num,
+                'status' => 0,
+                'pay_money' => $price['price'] * $num
+            ]
+        );
+
+        //返回刚刚下单id
+        $this->ajaxReturn(['error_code' => 0, 'data' => ['o_id' => $oId]]);
+
+    }
+
+    //用户支付接口
+    public function payMoney()
+    {
+        $oid = input('post.o_id', 0, 'intval');//订单id
+        $cid = input('post.c_id', 0, 'intval');//优惠券id
+        if (empty($oid) || empty($cid)) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误1']);
+        }
+        $rescid =
+            db('sc_user_coupon')
+                ->alias('uc')
+                ->leftJoin('sc_coupon c','uc.coupon_id=c.id')
+                ->where('uc.id', $cid)
+                ->field('c.money,c.cut_money')
+                ->find();
+        $resoid = db('sc_order')->where('id', $oid)->where('status', 0)->find();
+        if (empty($rescid) || empty($resoid)) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误2']);
+        }
+        if ($rescid['money'] > $resoid['pay_money']) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误,请勿乱修改前端数据']);
+        }
+
+        Db::startTrans();
+        try {
+            db('sc_user')->where('id', $this->userInfo['id'])->setDec('money', ($resoid['pay_money'] - $rescid['cut_money']));
+            db('sc_order')->where('id', $oid)->update(['status' => 1]);
+            db('sc_user_coupon')->where('id',$cid)->setDec('num',1);
+            Db::commit();
+        } catch (\Exception $e) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误,请勿乱修改前端数据']);
+        }
+
+        $this->ajaxReturn(['error_code' => 0, 'msg' => '购买成功，等待发货']);
+
+
+    }
+
 
 }
