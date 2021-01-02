@@ -133,7 +133,7 @@ class My extends Base
                 ->where('o.user_id', $this->userInfo['id'])
                 ->where('o.delete_time', 0)
                 ->limit($offset, $pagesize)
-                ->field('o.pro_id,o.pay_money,o.status,o.num,p.size,p.price,p.imgs,p.describe,p.title');
+                ->field('o.id,o.pro_id,o.pay_money,o.status,o.num,p.size,p.price,p.imgs,p.describe,p.title');
             $orders = null;
             switch ($type) {
                 case -1:
@@ -273,13 +273,12 @@ class My extends Base
         $this->ajaxReturn(['error_code' => 0, 'msg' => '操作成功']);
     }
 
-    //用户下单接口
+    //用户下单单个商品下单接口接口
     public function downOrder()
     {
         $pid = input('post.pid', 0, 'intval');
         $num = input('post.num', 1, 'intval');
         $price = db('sc_product')->where('id', $pid)->find();
-
         $oId = db('sc_order')->insertGetId(
             [
                 'user_id' => $this->userInfo['id'],
@@ -300,13 +299,38 @@ class My extends Base
     {
         $oid = input('post.o_id', 0, 'intval');//订单id
         $cid = input('post.c_id', 0, 'intval');//优惠券id
-        if (empty($oid) || empty($cid)) {
+        if (empty($oid)) {
             $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误1']);
         }
+
+        if(empty($cid)){
+//            var_dump($oid);
+//            die();
+            $resoid = db('sc_order')->where('id', $oid)->where('status', 0)->find();
+
+            if (empty($resoid) ) {
+                $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误2']);
+            }
+
+
+            Db::startTrans();
+            try {
+                db('sc_user')->where('id', $this->userInfo['id'])->setDec('money', $resoid['pay_money'] );
+                db('sc_order')->where('id', $oid)->update(['status' => 1]);
+
+                Db::commit();
+            } catch (\Exception $e) {
+                $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误,请勿乱修改前端数据']);
+            }
+
+            $this->ajaxReturn(['error_code' => 0, 'msg' => '购买成功，等待发货']);
+        }
+
+
         $rescid =
             db('sc_user_coupon')
                 ->alias('uc')
-                ->leftJoin('sc_coupon c','uc.coupon_id=c.id')
+                ->leftJoin('sc_coupon c', 'uc.coupon_id=c.id')
                 ->where('uc.id', $cid)
                 ->field('c.money,c.cut_money')
                 ->find();
@@ -322,7 +346,7 @@ class My extends Base
         try {
             db('sc_user')->where('id', $this->userInfo['id'])->setDec('money', ($resoid['pay_money'] - $rescid['cut_money']));
             db('sc_order')->where('id', $oid)->update(['status' => 1]);
-            db('sc_user_coupon')->where('id',$cid)->setDec('num',1);
+            db('sc_user_coupon')->where('id', $cid)->setDec('num', 1);
             Db::commit();
         } catch (\Exception $e) {
             $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误,请勿乱修改前端数据']);
@@ -333,5 +357,36 @@ class My extends Base
 
     }
 
+    //删除订单
+    public function deleteOrder()
+    {
+        $oid = input('post.oid', 0, 'intval');
+        if ($oid == 0) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误']);
+        }
+
+        $res = db('sc_order')->where('id', $oid)->delete();
+        if ($res) {
+            $this->ajaxReturn(['error_code' => 0, 'msg' => '删除订单成功']);
+        } else {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '删除订单失败']);
+        }
+
+    }
+
+    //确认收货
+    public function confirmOrder()
+    {
+        $oid = input('post.oid', 0, 'intval');
+        if ($oid == 0) {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '参数错误']);
+        }
+        $res = db('sc_order')->where('id', $oid)->update(['status'=>3]);
+        if ($res) {
+            $this->ajaxReturn(['error_code' => 0, 'msg' => '确认收货成功']);
+        } else {
+            $this->ajaxReturn(['error_code' => 1, 'msg' => '确认收货失败']);
+        }
+    }
 
 }

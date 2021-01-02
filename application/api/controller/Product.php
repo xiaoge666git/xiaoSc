@@ -104,7 +104,6 @@ class Product extends Base
             'nick_name'=>$this->userInfo['nick_name'],
             'phone'=>$this->userInfo['phone'],
             'address'=>$this->userInfo['address'],
-
         ];
         $order=db('sc_order')
             ->alias('o')
